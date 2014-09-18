@@ -10,7 +10,14 @@
 	        <field name="arch" type="xml">
 
                 <xpath expr="//button[@name='%(point_of_sale.action_pos_payment)d']" position="replace"/>
-                <xpath expr="//button[@name='refund']" position="after">
+                <xpath expr="//button[@name='action_invoice']" position="replace"/>
+
+                <xpath expr="//button[@name='%(point_of_sale.action_report_pos_receipt)d']" position="replace">
+                    <button name="pos_print_report" string="imprimir Ticket" type="object" states="paid,done,invoiced" groups="pos_extend.group_pos_caja" context="{'pos_session_id' : session_id}"/>
+                </xpath>
+
+                <!--<xpath expr="//button[@name='refund']" position="after"> -->
+                <xpath expr="//button[@name='refund']" position="replace">
                     <button name="%(point_of_sale.action_pos_payment)d" string="Payment" class="oe_highlight" type="action" states="draft" context="{'pos_session_id' : session_id}" groups="pos_extend.group_pos_caja"/>
                 </xpath>
 
