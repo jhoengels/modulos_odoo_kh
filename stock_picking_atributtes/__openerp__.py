@@ -27,10 +27,10 @@
 ##############################################################################
 
 {
-    "name": "Picking doc",
+    "name": "Stock Picking Atributes",
     "version": "1.0",
     "description": """
-        Añade nuevos campos al picking de ingreso
+        Añade nuevos campos de N. Fac y N. de Guia Porveedor , peso, bulto al picking
     """,
     "author": "Ing. Javer Salazar Carlos",
     "website": "http://salazarcarlos.com",
