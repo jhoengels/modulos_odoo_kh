@@ -25,29 +25,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{
-    "name" : "Pos extend",
-    "version" : "0.1",
-    "author" : "Ing. Javier Salazar Carlos",
-    "description" : """
-                    Extiende las funcionalidades del punto de venta.
-                    - Permite hacer pedido de distintos almacenes
-                    """,
-    "website" : "http://salazarcarlos.com",
-    "depends" : ["base", "stock",'point_of_sale','sale','product_attribute','product_qty_disponible','sale_multishop'],
-    "data" : [
-            'pos_extend_view.xml',
-            'pos_order_report.xml',
-	        'security/pos_extend_security.xml',
-	        'wizard/pos_payment.xml',
-    ],
-    "demo_xml" : [
-    ],
-    "update_xml" : [
-            'pos_extend_view.xml',
-    ],
-    "active": False,
-    "installable": True,
-}
+
+
+import pos_order_print
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
