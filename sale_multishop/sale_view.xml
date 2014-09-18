@@ -11,11 +11,20 @@
                 <field name="pricelist_id" position="after">
                     <field name="journal_id" domain="[('type', '=', 'sale')]"/>
                     <field name="sequence_id"/>
-                    <separator string="Usuarios" colspan="4"/>
-                    <field name="user_ids" nolabel="1"  widget="many2many_tags" />
-                    <separator string="Medios de pago" colspan="4"/>
-                    <field name="journal_ids" nolabel="1"  widget="many2many_tags" />
                 </field>
+                <!-- <xpath expr="//group[@string='Sale Conditions']" position="inside"> --> 
+                <xpath expr="//group[@name='shop']" position="inside">
+                    <group>
+                        <field name="shop_address" colspan="6" />
+                        <field name="state_id" colspan="6" />  
+                        <field name="shop_telef" colspan="6" />                
+                        <separator string="Usuarios" />
+                        <field name="user_ids" nolabel="1" colspan="6" widget="many2many_tags" />
+                        <separator string="Medios de pago" />
+                        <field name="journal_ids" nolabel="1" colspan="6" widget="many2many_tags" />
+                    </group>
+                </xpath>
+
             </field>
         </record>
 

@@ -37,6 +37,9 @@ class sale_shop(osv.osv):
         'sequence_id': fields.many2one('ir.sequence', "Secuencia orden venta", help="La secuencia utilizada para las ordenes de venta."),
         'journal_id': fields.many2one('account.journal', "Diario contable", help="Diario utilizado para las ventas de esta tienda"),
         'journal_ids': fields.many2many('account.journal', 'account_shop_rel', 'shop_id', 'journal_id', "Medios de pago"),
+        'shop_address': fields.char('Direccion'),
+        'state_id': fields.many2one("res.country.state", 'Departamento/Provincia/Distrito'),
+        'shop_telef': fields.char('Telefono'),
     }
 sale_shop()
 
