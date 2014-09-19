@@ -287,7 +287,7 @@ class pos_order(osv.osv):
         }
         return {
             'type': 'ir.actions.report.xml',
-            'report_name': 'pos.receipt',
+            'report_name': 'pos.order.print.ticket',
             'datas': datas,
             'nodestroy' : True
         }
