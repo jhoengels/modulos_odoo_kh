@@ -22,7 +22,9 @@
 				<field name="partner_id" position='after'>
 					<field name="ruc_dni" />
 				</field>
-				<field name="fiscal_position" position='replace' />
+				<field name="fiscal_position" position='attributes'>
+					<attribute name="invisible">1</attribute>
+			    </field>
 				<field name="journal_id" position='replace' />
 				<field name="partner_id" position='before'>		
 				<field name="journal_id" string="Tipo Documento"
