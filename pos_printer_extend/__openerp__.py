@@ -37,13 +37,11 @@
     "depends" : ["base", "pos_extend",],
     "data" : [
             'pos_printer_view.xml',
-	        #'security/security.xml',
     ],
     "demo_xml" : [
     ],
     "update_xml" : [
             'pos_printer_view.xml',
-
     ],
     "active": False,
     "installable": True,
