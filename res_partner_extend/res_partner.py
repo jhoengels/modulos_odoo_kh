@@ -179,10 +179,16 @@ class res_partner(osv.osv):
                     #name_empresa = ' '.join(name_empres.split())
                     import HTMLParser
                     hparser=HTMLParser.HTMLParser()
-                    res['value']['name'] = hparser.unescape(name_empresa)
-                    res['value']['apellidopaterno'] = n[0]
-                    res['value']['apellidomaterno'] = n[1]
-                    res['value']['nombres'] = n[2] + ' ' + n[3]
+                    if len(n)>3:
+                        res['value']['name'] = hparser.unescape(name_empresa)
+                        res['value']['apellidopaterno'] = n[0]
+                        res['value']['apellidomaterno'] = n[1]
+                        res['value']['nombres'] = n[2] + ' ' + n[3]
+                    if len(n)==3:
+                        res['value']['name'] = hparser.unescape(name_empresa)
+                        res['value']['apellidopaterno'] = n[0]
+                        res['value']['apellidomaterno'] = n[1]
+                        res['value']['nombres'] = n[2]                      
 
 
                     #_logger.error("partner -: %r", name_empresa)
