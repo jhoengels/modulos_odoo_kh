@@ -349,8 +349,6 @@ class stock_picking(osv.osv):
         return res
 
 
-
-
 class stock_picking_in(osv.osv):
     _name = "stock.picking.in"
     _inherit = "stock.picking.in"
@@ -520,6 +518,58 @@ class stock_move(osv.osv):
         if new_moves:
             new_moves += self.create_chained_picking(cr, uid, new_moves, context)
         return new_moves
+
+    #
+    # Duplicate stock.move
+    #
+    def check_assign(self, cr, uid, ids, context=None):
+        """ Checks the product type and accordingly writes the state.
+        @return: No. of moves done
+        """
+        done = []
+        count = 0
+        pickings = {}
+        if context is None:
+            context = {}
+        for move in self.browse(cr, uid, ids, context=context):
+            if move.product_id.type == 'consu' or move.location_id.usage == 'supplier':
+                if move.state in ('confirmed', 'waiting'):
+                    done.append(move.id)
+                pickings[move.picking_id.id] = 1
+                continue
+            if move.state in ('confirmed', 'waiting'):
+                # Important: we must pass lock=True to _product_reserve() to avoid race conditions and double reservations
+                res = self.pool.get('stock.location')._product_reserve(cr, uid, [move.location_id.id], move.product_id.id, move.product_qty, {'uom': move.product_uom.id}, lock=True)
+                if res:
+                    #_product_available_test depends on the next status for correct functioning
+                    #the test does not work correctly if the same product occurs multiple times
+                    #in the same order. This is e.g. the case when using the button 'split in two' of
+                    #the stock outgoing form
+                    self.write(cr, uid, [move.id], {'state':'assigned'})
+                    done.append(move.id)
+                    pickings[move.picking_id.id] = 1
+                    r = res.pop(0)
+                    product_uos_qty = self.pool.get('stock.move').onchange_quantity(cr, uid, [move.id], move.product_id.id, r[0], move.product_id.uom_id.id, move.product_id.uos_id.id)['value']['product_uos_qty']
+                    cr.execute('update stock_move set location_id=%s, product_qty=%s, product_uos_qty=%s where id=%s', (r[1], r[0],product_uos_qty, move.id))
+
+                    while res:
+                        r = res.pop(0)
+                        product_uos_qty = self.pool.get('stock.move').onchange_quantity(cr, uid, [move.id], move.product_id.id, r[0], move.product_id.uom_id.id, move.product_id.uos_id.id)['value']['product_uos_qty']
+                        move_id = self.copy(cr, uid, move.id, {'product_uos_qty': product_uos_qty, 'product_qty': r[0], 'location_id': r[1]})
+                        done.append(move_id)
+                else:
+                    raise osv.except_osv(_('Warning!'),_('Verifique su stock, no hay stock suficiente, Producto: "%s"') %(move.product_id.name))          
+
+        if done:
+            count += len(done)
+            self.write(cr, uid, done, {'state': 'assigned'})
+
+        if count:
+            for pick_id in pickings:
+                wf_service = netsvc.LocalService("workflow")
+                wf_service.trg_write(uid, 'stock.picking', pick_id, cr)
+        return count
+
 stock_move()
 
 
@@ -582,7 +632,7 @@ class sale_order(osv.osv):
 
         if picking_id:
             wf_service.trg_validate(uid, 'stock.picking', picking_id, 'button_confirm', cr)
-            picking_obj.action_assign(cr, uid, [picking_id], context) #PARA CUANDO DE EJECUTE EL PICKING Y PASE A ESTADO RESERVADO AUTOMATICAMENTE
+            #picking_obj.action_assign(cr, uid, [picking_id], context) #PARA CUANDO DE EJECUTE EL PICKING Y PASE A ESTADO RESERVADO AUTOMATICAMENTE
         for proc_id in proc_ids:
             wf_service.trg_validate(uid, 'procurement.order', proc_id, 'button_confirm', cr)
 
