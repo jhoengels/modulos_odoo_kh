@@ -94,7 +94,7 @@ class res_partner(osv.osv):
             value['doc_type'] = '1'
         return {'value': value, 'domain': domain}
 
-    def onchange_doc_number(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
+    def onchange_doc_number_DOC_CLIENTES_RENIEC(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
         #response = urllib2.urlopen('http://www.sunat.gob.pe/w/wapS01Alias?ruc=20514540145')
         #html = response.read()
         #url='http://www.sunat.gob.pe/w/wapS01Alias?ruc=20553291501'
@@ -206,7 +206,7 @@ class res_partner(osv.osv):
             res['value']['doc_number'] = False
             return res
 
-    def onchange_doc_number_BACKUP(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
+    def onchange_doc_number(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
         #response = urllib2.urlopen('http://www.sunat.gob.pe/w/wapS01Alias?ruc=20514540145')
         #html = response.read()
         #url='http://www.sunat.gob.pe/w/wapS01Alias?ruc=20553291501'
@@ -278,15 +278,41 @@ class res_partner(osv.osv):
                 name_empresa = None
                 for d in res_empres:
                     name_empres =  (d[66:-4])
+
                     n = name_empres.split()    
                     name_empresa = ' '.join(name_empres.split())
+                    #_logger.error("partner000 -: %r", name_empresa)
                     import HTMLParser
                     hparser=HTMLParser.HTMLParser()
-                    res['value']['name'] = hparser.unescape(hparser.unescape(name_empresa.decode('latin_1')))
 
-                    _logger.error("partner -: %r", res['value']['name'])
+                    if len(n)==4:
+                        #res['value']['name'] = hparser.unescape(hparser.unescape(name_empresa.decode('latin_1')))
+                        #res['value']['name'] = n[2] + ' ' +  n[3]+ ' ' + n[0] + ' ' +  n[1]   
+                        res['value']['name'] = (n[2] + ' ' +  n[3]+ ' ' + n[0] + ' ' +  n[1]).decode('latin_1')
+                        #_logger.error("partner -: %r", res['value']['name'])
+                        res['value']['apellidopaterno'] = (n[2]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[3]).decode('latin_1')
+                        res['value']['nombres'] = (n[0] + ' ' + n[1]).decode('latin_1')
+                    if len(n)==3:
+                        res['value']['name'] = (n[1] + ' ' +  n[2]+ ' ' + n[0]).decode('latin_1')
+                        res['value']['apellidopaterno'] = (n[1]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[2]).decode('latin_1')
+                        res['value']['nombres'] = (n[0]).decode('latin_1')
+
+                    if len(n)==6 and n[2]=='DE':
+                        res['value']['name'] = (n[2] + ' ' +  n[3]+ ' ' + n[4]+ ' ' + n[5]+ ' ' + n[0]+ ' ' + n[1]).decode('latin_1')
+                        res['value']['apellidopaterno'] = (n[2]+ ' ' + n[3]+ ' ' + n[4]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[5]).decode('latin_1')
+                        res['value']['nombres'] = (n[0]+ ' ' + n[1]).decode('latin_1')
+
+                    if len(n)==6 and n[2]!='DE':
+                        res['value']['name'] = (n[2] + ' ' +  n[3]+ ' ' + n[4]+ ' ' + n[5]+ ' ' + n[0]+ ' ' + n[1]).decode('latin_1')
+                        res['value']['apellidopaterno'] = (n[2]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[3]+ ' ' + n[4]+ ' ' + n[5]).decode('latin_1')
+                        res['value']['nombres'] = (n[0]+ ' ' + n[1]).decode('latin_1')
     
                 #res['value']['name'] = name_empresa
+                #JAVIER(0) SALAZAR(1) CARLOS(2)
                 return res
             else:
                 res['value']['street'] = False
