@@ -61,9 +61,9 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-    <!--
+
         <menuitem name="Reniec" id="menu_descripcion" action="action_open_links_form" parent="base.menu_product" sequence="2"/>
-    -->
+
 <!--
         <record id="product_product_tree_extern_code_inherit" model="ir.ui.view">
             <field name="name">product.product.extern.code.view.tree</field>

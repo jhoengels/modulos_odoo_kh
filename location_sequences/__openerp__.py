@@ -34,7 +34,7 @@
                     """,
     "website" : "http://salazarcarlos.com",
     "category" : "stock",
-    "depends" : ["base", "stock",'sale','purchase','stock_picking_location'],
+    "depends" : ["base", "stock",'sale_stock','purchase','stock_picking_location'],
     "data" : [
             'stock_picking_view.xml',
 	        'security/security.xml',

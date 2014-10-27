@@ -22,6 +22,8 @@
 import time
 from openerp.report import report_sxw
 from openerp import pooler
+import logging
+_logger = logging.getLogger(__name__)
 
 def titlize(journal_name):
     words = journal_name.split()
@@ -41,6 +43,11 @@ class pos_order_print(report_sxw.rml_parse):
             'time': time,
             'disc': self.discount,
             'net': self.netamount,
+            'exo': self._exonerado,
+            'get_reg_prod_name': self.regalo_product_name,
+            'get_reg_prod_vr': self.regalo_product_vr,
+            'get_reg_prod_igv': self.regalo_product_igv,
+            'tbruto': self.total_bruto,
             'get_journal_amt': self._get_journal_amt,
             'address': partner or False,
             'titlize': titlize
@@ -50,7 +57,19 @@ class pos_order_print(report_sxw.rml_parse):
         sql = 'select (qty*price_unit) as net_price from pos_order_line where id = %s'
         self.cr.execute(sql, (order_line_id,))
         res = self.cr.fetchone()
+        #_logger.error("ORDER ID 1: %r", res)
         return res[0]
+
+    def _exonerado(self, order_id):
+        pos_order_obj = self.pool.get('pos.order')
+        #_logger.error("ORDER ID 1: %r", order_id)
+        pos_order_id = pos_order_obj.search(self.cr,self.uid,[('id','=',order_id)])
+        for pos_line in pos_order_obj.browse(self.cr, self.uid, pos_order_id):
+            exo=0.0
+            for posline in pos_line.lines:
+                if not posline.product_id.taxes_id:
+                    exo += posline.price_subtotal            
+        return exo
 
     def discount(self, order_id):
         sql = 'select discount, price_unit, qty from pos_order_line where order_id = %s '
@@ -60,7 +79,63 @@ class pos_order_print(report_sxw.rml_parse):
         for line in res:
             if line[0] != 0:
                 dsum = dsum +(line[2] * (line[0]*line[1]/100))
+        #_logger.error("DESCUENTO 1: %r", dsum)
         return dsum
+    
+    def regalo_product_name(self, order_line_id):
+        sql = 'select product_id, price_unit, qty from pos_order_line where id = %s '
+        self.cr.execute(sql, (order_line_id,))
+        res = self.cr.fetchone()
+        if res[1]==0.0:
+            product_obj = self.pool.get('product.product')
+            product_id = product_obj.search(self.cr,self.uid,[('id','=',res[0])])
+            for val in product_obj.browse(self.cr, self.uid, product_id):
+                product_name = val.name
+            return product_name
+        else:
+            return False
+
+    def regalo_product_vr(self, order_line_id):
+        sql = 'select product_id, price_unit, qty from pos_order_line where id = %s '
+        self.cr.execute(sql, (order_line_id,))
+        res = self.cr.fetchone()
+        if res[1]==0.0:
+            product_obj = self.pool.get('product.product')
+            product_id = product_obj.search(self.cr,self.uid,[('id','=',res[0])])
+            for val in product_obj.browse(self.cr, self.uid, product_id):
+                if val.taxes_id:
+                    valor_referencial = val.list_price*res[2]/1.18
+                else:
+                    valor_referencial = val.list_price*res[2]
+            return valor_referencial
+        else:
+            return False
+
+    def regalo_product_igv(self, order_line_id):
+        sql = 'select product_id, price_unit, qty from pos_order_line where id = %s '
+        self.cr.execute(sql, (order_line_id,))
+        res = self.cr.fetchone()
+        if res[1]==0.0:
+            product_obj = self.pool.get('product.product')
+            product_id = product_obj.search(self.cr,self.uid,[('id','=',res[0])])
+            for val in product_obj.browse(self.cr, self.uid, product_id):
+                if val.taxes_id:
+                    igv = (val.list_price*res[2])/1.18*0.18
+                else:
+                    igv= 0
+            return igv
+        else:
+            return False
+
+    def total_bruto(self, order_id):
+        sql = 'select price_unit, qty from pos_order_line where order_id = %s '
+        self.cr.execute(sql, (order_id,))
+        res = self.cr.fetchall()
+        tb = 0
+        for line in res:
+            tb = tb +(line[0] * line[1])
+        #_logger.error("DESCUENTO 1: %r", tb)
+        return tb
 
     def _get_journal_amt(self, order_id):
         data={}

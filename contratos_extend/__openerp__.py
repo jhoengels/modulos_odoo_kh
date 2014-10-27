@@ -26,22 +26,25 @@
 #
 ##############################################################################
 {
-    "name" : "Pos printer extend",
+    "name" : "Contratos tiendas",
     "version" : "0.1",
     "author" : "Ing. Javier Salazar Carlos",
     "description" : """
-                    Permite gestionar las ticketeras en los puntos de venta
+                    Permite gestionar los contratos por tiendas
                     """,
     "website" : "http://salazarcarlos.com",
-    "category" : "stock",
-    "depends" : ["base", "pos_extend",],
+    "category" : "",
+    "depends" : ['analytic','account_analytic_analysis'],
     "data" : [
-            'pos_printer_view.xml',
+            'contrato_view.xml',
+	        'security/security.xml',
     ],
     "demo_xml" : [
     ],
     "update_xml" : [
-            'pos_printer_view.xml',
+            'contrato_view.xml',
+#            'security/security.xml',
+#            'stock_picking_sequence.xml',
     ],
     "active": False,
     "installable": True,

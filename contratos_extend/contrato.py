@@ -1,3 +1,4 @@
+
 # -*- encoding: utf-8 -*-
 ##############################################################################
 #
@@ -25,26 +26,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{
-    "name" : "Pos printer extend",
-    "version" : "0.1",
-    "author" : "Ing. Javier Salazar Carlos",
-    "description" : """
-                    Permite gestionar las ticketeras en los puntos de venta
-                    """,
-    "website" : "http://salazarcarlos.com",
-    "category" : "stock",
-    "depends" : ["base", "pos_extend",],
-    "data" : [
-            'pos_printer_view.xml',
-    ],
-    "demo_xml" : [
-    ],
-    "update_xml" : [
-            'pos_printer_view.xml',
-    ],
-    "active": False,
-    "installable": True,
-}
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+
+from openerp.osv import osv,fields
+from openerp import netsvc
+from openerp.tools.translate import _
+import time
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+import logging
+_logger = logging.getLogger(__name__)
+
+
+class account_analytic_account(osv.osv):
+    _name = "account.analytic.account"
+    _inherit = "account.analytic.account"
+
+    _columns  =  {      
+        'shop_id': fields.many2one('sale.shop', 'Tienda', help='Tienda relacionada con el usuario actual'),
+    }

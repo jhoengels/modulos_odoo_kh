@@ -94,7 +94,8 @@ class res_partner(osv.osv):
             value['doc_type'] = '1'
         return {'value': value, 'domain': domain}
 
-    def onchange_doc_number(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
+    #OBTENIENDO DATOS DE http://clientes.reniec.gob.pe/padronElectoral2012/consulta.htm NO FOUND
+    def onchange_doc_number_DOC_CLIENTES_RENIEC(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
         #response = urllib2.urlopen('http://www.sunat.gob.pe/w/wapS01Alias?ruc=20514540145')
         #html = response.read()
         #url='http://www.sunat.gob.pe/w/wapS01Alias?ruc=20553291501'
@@ -179,10 +180,16 @@ class res_partner(osv.osv):
                     #name_empresa = ' '.join(name_empres.split())
                     import HTMLParser
                     hparser=HTMLParser.HTMLParser()
-                    res['value']['name'] = hparser.unescape(name_empresa)
-                    res['value']['apellidopaterno'] = n[0]
-                    res['value']['apellidomaterno'] = n[1]
-                    res['value']['nombres'] = n[2] + ' ' + n[3]
+                    if len(n)>3:
+                        res['value']['name'] = hparser.unescape(name_empresa)
+                        res['value']['apellidopaterno'] = n[0]
+                        res['value']['apellidomaterno'] = n[1]
+                        res['value']['nombres'] = n[2] + ' ' + n[3]
+                    if len(n)==3:
+                        res['value']['name'] = hparser.unescape(name_empresa)
+                        res['value']['apellidopaterno'] = n[0]
+                        res['value']['apellidomaterno'] = n[1]
+                        res['value']['nombres'] = n[2]                      
 
 
                     #_logger.error("partner -: %r", name_empresa)
@@ -200,7 +207,8 @@ class res_partner(osv.osv):
             res['value']['doc_number'] = False
             return res
 
-    def onchange_doc_number_BACKUP(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
+    #OBTENIENDO DATOS DE https://cel.reniec.gob.pe/valreg/valreg.do FOUND
+    def onchange_doc_number_RENIEC(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
         #response = urllib2.urlopen('http://www.sunat.gob.pe/w/wapS01Alias?ruc=20514540145')
         #html = response.read()
         #url='http://www.sunat.gob.pe/w/wapS01Alias?ruc=20553291501'
@@ -272,15 +280,138 @@ class res_partner(osv.osv):
                 name_empresa = None
                 for d in res_empres:
                     name_empres =  (d[66:-4])
+
                     n = name_empres.split()    
                     name_empresa = ' '.join(name_empres.split())
+                    #_logger.error("partner000 -: %r", name_empresa)
+                    import HTMLParser
+                    hparser=HTMLParser.HTMLParser()
+
+                    if len(n)==4:
+                        #res['value']['name'] = hparser.unescape(hparser.unescape(name_empresa.decode('latin_1')))
+                        #res['value']['name'] = n[2] + ' ' +  n[3]+ ' ' + n[0] + ' ' +  n[1]   
+                        res['value']['name'] = (n[2] + ' ' +  n[3]+ ' ' + n[0] + ' ' +  n[1]).decode('latin_1')
+                        #_logger.error("partner -: %r", res['value']['name'])
+                        res['value']['apellidopaterno'] = (n[2]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[3]).decode('latin_1')
+                        res['value']['nombres'] = (n[0] + ' ' + n[1]).decode('latin_1')
+                    if len(n)==3:
+                        res['value']['name'] = (n[1] + ' ' +  n[2]+ ' ' + n[0]).decode('latin_1')
+                        res['value']['apellidopaterno'] = (n[1]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[2]).decode('latin_1')
+                        res['value']['nombres'] = (n[0]).decode('latin_1')
+
+                    if len(n)==6 and n[2]=='DE':
+                        res['value']['name'] = (n[2] + ' ' +  n[3]+ ' ' + n[4]+ ' ' + n[5]+ ' ' + n[0]+ ' ' + n[1]).decode('latin_1')
+                        res['value']['apellidopaterno'] = (n[2]+ ' ' + n[3]+ ' ' + n[4]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[5]).decode('latin_1')
+                        res['value']['nombres'] = (n[0]+ ' ' + n[1]).decode('latin_1')
+
+                    if len(n)==6 and n[2]!='DE':
+                        res['value']['name'] = (n[2] + ' ' +  n[3]+ ' ' + n[4]+ ' ' + n[5]+ ' ' + n[0]+ ' ' + n[1]).decode('latin_1')
+                        res['value']['apellidopaterno'] = (n[2]).decode('latin_1')
+                        res['value']['apellidomaterno'] = (n[3]+ ' ' + n[4]+ ' ' + n[5]).decode('latin_1')
+                        res['value']['nombres'] = (n[0]+ ' ' + n[1]).decode('latin_1')
+    
+                #res['value']['name'] = name_empresa
+                #JAVIER(0) SALAZAR(1) CARLOS(2)
+                return res
+            else:
+                res['value']['street'] = False
+                res['value']['name'] = False
+                #res['value']['doc_number'] = False
+                return res
+        else:
+            #res['value']['street'] = False
+            #res['value']['name'] = False
+            #res['value']['doc_number'] = False
+            return res
+
+    #OBTENIENDO DATOS DE http://aplicaciones.pronabec.gob.pe/Feria2014/Servicios/Get_RENIEC FOUND
+    def onchange_doc_number(self, cr, uid, ids, doc_type, doc_number, is_company, context=None):
+        #response = urllib2.urlopen('http://www.sunat.gob.pe/w/wapS01Alias?ruc=20514540145')
+        #html = response.read()
+        #url='http://www.sunat.gob.pe/w/wapS01Alias?ruc=20553291501'
+        #_logger.error("DOC_TUY: %r", doc_number)
+        #str1 = raw_input("NGRESO CODIGO:")
+        #_logger.error("DOC_TUY: %r", str1)
+        res = {'value':{}}
+        if doc_number:
+            if doc_type in ('6') and len(doc_number) == 11:
+                url="http://www.sunat.gob.pe/w/wapS01Alias?ruc="+doc_number
+                data = get_url(url)
+
+                res_empres = re.findall('''<small><b>N&#xFA;mero Ruc. </b> \d+ - .* <br/></small>''', data)
+                for d in res_empres:
+                    name_empresa =  (d[46:-14])
+                    _logger.error("wennnnnnnnn----: %r", name_empresa)
                     import HTMLParser
                     hparser=HTMLParser.HTMLParser()
                     res['value']['name'] = hparser.unescape(hparser.unescape(name_empresa.decode('latin_1')))
+        
+                res_direcc = re.findall('''<small><b>Direcci&#xF3;n.</b><br/>.*</small><br/>''', data)
+                for d in res_direcc:
+                    direccion =  (d[34:-13])
+                    import HTMLParser
+                    hparser=HTMLParser.HTMLParser()
+                    res['value']['street'] = hparser.unescape(hparser.unescape(direccion.decode('latin_1')))                 
+                return res
+            elif doc_type in ('1') and len(doc_number) == 8:
 
-                    _logger.error("partner -: %r", res['value']['name'])
-    
+                
+                args = []
+                reniec_obj = self.pool.get('res.partner.cookie.reniec')
+                ids = reniec_obj.search(cr, uid, args, offset=0, limit=None, order=None, context=None, count=False)
+                img=None
+                micookie = None
+                for value in reniec_obj.browse(cr, uid, ids):
+                    img = value.name
+                    micookie = "JSESSIONID="+value.cookie_reniec
+                    #_logger.error("MI Cwwwwww: %r", micookie)
+
+                dni= doc_number
+                #---------------------
+
+                url="http://aplicaciones.pronabec.gob.pe/Feria2014/Servicios/Get_RENIEC"
+                
+                micookie="__RequestVerificationToken_L0ZlcmlhMjAxNA2=bzJyrpSo_yH--r4fpeIy1JMVdenQ3h_bo67Sf6BKPHIwT7_RmA0hk1vXnH1sPYlzZDnMirH2Lrs6tSTSDR8hvl-IsenZPfVBGtqd_giqMiQ1"
+
+                #cookie_j = cookielib.CookieJar()  
+                #cookie_h = urllib2.HTTPCookieProcessor(cookie_j)  
+                #opener = urllib2.build_opener(cookie_h)  
+                #opener.open("https://cel.reniec.gob.pe/valreg/codigo.do")  
+                #opener.open("https://cel.reniec.gob.pe/valreg/valreg.do")
+                #micookie=None
+                #for num, cookie in enumerate(cookie_j):  
+                #    micookie=cookie.name + "="+ cookie.value
+                #_logger.error("MI COOKIE WEB: %r", micookie)
+                #----------------
+                
+                #data="accion=buscar&tecla_7=5&tecla_8=2&tecla_9=0&tecla_4=1&tecla_5=6&tecla_6=9&tecla_1=8&tecla_2=7&tecla_3=3&tecla_0=4&nuDni="+dni+"&imagen="+img+"&bot_consultar.x=75&bot_consultar.y=23"
+                data="__RequestVerificationToken=NG_F7TKTxs-HAmDaa7iQcdt214TUli5hHrLElSYv8reoYbFNH_Rj_3jhqyn9wmNSg3797Cyf_5fcvQKYFYbj_jTMARWXPs-ckdyNQlPYBJk1&Formulario_Nro_Documento="+dni+"&Formulario_Ape_Paterno=&Formulario_Ape_Materno=&Formulario_Ape_Nombres=&Formulario_Fecha_Nacimiento=&Formulario_Ocupacion=&Formulario_Grado=&Formulario_Tercio=&Formulario_Correo_Electronico=&Formulario_Correo_Electronico_Repita=&Formulario_Telefono_Contacto=&Formulario_Pais=&Formulario_Especialidad="
+                req = urllib2.Request(url)
+                req.add_header('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:28.0) Gecko/20100101 Firefox/28.0')
+                req.add_header('Cookie',micookie)
+                page = urllib2.urlopen(req,data)
+                response=page.read();page.close()
+                
+                lista0= (response.strip("{}; "))
+                lista1 = lista0.replace('"', "")
+
+                lista2 = lista1.split(',')
+                Apaterno= lista2[1]
+                Amaterno= lista2[2]
+                Nombres= lista2[3]
+
+                res['value']['name'] = Apaterno.lstrip("apePaterno:" ) +' ' +Amaterno.lstrip("apeMaterno:" ) + ' ' +Nombres.lstrip("Nombres:" )
+                res['value']['apellidopaterno'] = Apaterno.lstrip("apePaterno:" )
+                res['value']['apellidomaterno'] = Amaterno.lstrip("apeMaterno:" )
+                res['value']['nombres'] = Nombres.lstrip("Nombres:" )
+
+                _logger.error("partner000 -: %r", res['value']['name'])
+
                 #res['value']['name'] = name_empresa
+                #JAVIER(0) SALAZAR(1) CARLOS(2)
                 return res
             else:
                 res['value']['street'] = False

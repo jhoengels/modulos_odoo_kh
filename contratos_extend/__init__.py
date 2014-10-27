@@ -25,26 +25,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{
-    "name" : "Pos printer extend",
-    "version" : "0.1",
-    "author" : "Ing. Javier Salazar Carlos",
-    "description" : """
-                    Permite gestionar las ticketeras en los puntos de venta
-                    """,
-    "website" : "http://salazarcarlos.com",
-    "category" : "stock",
-    "depends" : ["base", "pos_extend",],
-    "data" : [
-            'pos_printer_view.xml',
-    ],
-    "demo_xml" : [
-    ],
-    "update_xml" : [
-            'pos_printer_view.xml',
-    ],
-    "active": False,
-    "installable": True,
-}
+
+
+import contrato
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -27,8 +27,7 @@
 			    </field>
 				<field name="journal_id" position='replace' />
 				<field name="partner_id" position='before'>		
-				<field name="journal_id" string="Tipo Documento"
-                                on_change="onchange_journal_id(journal_id, context)" widget="selection"/>
+				<field name="journal_id" string="Tipo Documento" on_change="onchange_journal_id(journal_id, context)" widget="selection" domain="[('type','=','sale')]"/>
                 </field>            	
 			</field>
 		</record>
